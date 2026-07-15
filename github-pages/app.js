@@ -189,14 +189,6 @@ function openLesson(day) {
   const guide = lesson.guide;
   $("modal-kicker").textContent = `DAY ${String(day).padStart(2,"0")} · ${phases[lesson.phaseIndex].title}`;
   $("modal-title").textContent = lesson.title;
-  $("modal-intro").textContent = lesson.description;
-  $("modal-goal").textContent = guide.deliverable;
-  $("reader-summary").textContent = guide.summary;
-  $("reader-concepts").innerHTML = guide.concepts.map(item=>`<li>${item}</li>`).join("");
-  $("reader-example").textContent = guide.example;
-  $("reader-listen").textContent = guide.listen;
-  $("creation-prompt").textContent = guide.practice.join(" → ");
-  $("reader-deliverable").textContent = guide.deliverable;
   $("previous-day").disabled = day===1;
   $("next-day").disabled = day===100;
   $("notice").hidden = true;

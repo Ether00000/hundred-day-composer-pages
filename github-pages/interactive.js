@@ -153,7 +153,7 @@ const InteractiveCourse = (() => {
     container.querySelectorAll("[data-choice]").forEach(button=>button.addEventListener("click",()=>{
       if(button.dataset.choice==="correct"){
         container.querySelectorAll("[data-choice]").forEach(el=>el.disabled=true);
-        button.classList.add("correct");mark(day,0);message(container,"✓ 回答正确，可以进入声音实验",true);
+        button.classList.add("correct");mark(day,0);message(container,`✓ 学会了：${correct}`,true);
       }else{button.classList.add("wrong");message(container,"还不对。回看上面的知识卡，再试一次。")}
     }));
   }

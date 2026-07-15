@@ -64,31 +64,25 @@
       <button class="modal-close" id="modal-close" aria-label="关闭课程">×</button>
       <p class="eyebrow" id="modal-kicker"></p>
       <h2 id="modal-title"></h2>
-      <p class="modal-intro" id="modal-intro"></p>
-      <div class="lesson-goal"><small>今天的目标</small><strong id="modal-goal"></strong></div>
 
       <div class="course-stepper">
         <div class="course-progress" id="course-progress" aria-label="今日课程步骤"></div>
 
         <div class="course-panel" data-course-panel="0">
           <p class="reader-number">STEP 1 · 概念挑战</p>
-          <h3>看一张知识卡，马上作答</h3>
-          <p class="reader-summary" id="reader-summary"></p>
-          <ul id="reader-concepts"></ul>
+          <h3>直接答题，在反馈中学会</h3>
           <div id="concept-interaction"></div>
         </div>
 
         <div class="course-panel example-card" data-course-panel="1" hidden>
           <p class="reader-number">STEP 2 · 互动实验</p>
-          <h3>不用只读，直接操作</h3>
-          <p id="reader-example"></p>
+          <h3>调节参数，马上听到变化</h3>
           <div id="example-interaction"></div>
         </div>
 
         <div class="course-panel listen-card" data-course-panel="2" hidden>
           <p class="reader-number">STEP 3 · 听辨练习</p>
-          <h3>先播放，再带着问题听</h3>
-          <p id="reader-listen"></p>
+          <h3>播放声音并完成听辨题</h3>
           <div class="native-audio-box"><strong>今日声音示例</strong><audio id="lesson-native-audio" controls preload="metadata" playsinline></audio><span>这是浏览器原生播放器；请点击三角形播放。</span></div>
           <div id="ear-interaction"></div>
           <p class="audio-tip">音频在页面内生成，不需要外部音频网站。若进度在走但没声音，请检查标签页和系统是否静音。</p>
@@ -96,10 +90,8 @@
 
         <div class="course-panel practice-card" data-course-panel="3" hidden>
           <p class="reader-number">STEP 4 · 创作挑战</p>
-          <h3>用实验台完成今日作品</h3>
-          <p id="creation-prompt"></p>
+          <h3>在实验台完成今日作品</h3>
           <div id="creation-interaction"></div>
-          <div class="completion-standard"><small>完成标准</small><strong id="reader-deliverable"></strong></div>
         </div>
 
         <div class="course-panel checkin-panel" data-course-panel="4" hidden>
