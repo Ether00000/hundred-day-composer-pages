@@ -77,17 +77,10 @@ async function ensureAudio() {
   return audioContext;
 }
 
-async function playChord(chord, button) {
+function playChord(chord, button) {
   document.querySelectorAll("[data-chord]").forEach(el=>el.classList.remove("active"));
   button.classList.add("active");
-  let audio;
-  try { audio = await ensureAudio(); } catch (_) { button.classList.remove("active"); return; }
-  const master = audio.createGain();
-  master.gain.setValueAtTime(.0001,audio.currentTime);
-  master.gain.exponentialRampToValueAtTime(.12,audio.currentTime+.03);
-  master.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+1.2);
-  master.connect(audio.destination);
-  chord.notes.forEach((frequency,index)=>{const oscillator=audio.createOscillator();oscillator.type=index===0?"triangle":"sine";oscillator.frequency.value=frequency;oscillator.connect(master);oscillator.start(audio.currentTime+index*.025);oscillator.stop(audio.currentTime+1.25)});
+  AudioEngine.playChord(chord.notes,1.25,{onError:()=>button.classList.remove("active")});
   setTimeout(()=>button.classList.remove("active"),1250);
 }
 
@@ -127,19 +120,15 @@ function resetAudioUI(finished=false) {
   $("waveform").classList.remove("is-playing");
   $("music-play").textContent="▶";
   $("track-play").textContent="▶";
-  $("lesson-audio-play").textContent="▶";
   $("music-play").setAttribute("aria-label","播放音乐示例");
   $("track-play").setAttribute("aria-label","播放创作片段");
-  $("lesson-audio-play").setAttribute("aria-label","播放今日音乐示例");
-  const bar=$("lesson-audio-bar");
-  bar.style.transition="none";
-  bar.style.width="0";
-  $("lesson-audio-status").textContent=finished?"播放完成 · 可以再听一次":"点击播放 · 约 8 秒";
+  if(finished)$("audio-status").textContent="播放完成 · 可再次试听";
 }
 
 function stopPlayback(finished=false) {
   if (audioEndTimer) clearTimeout(audioEndTimer);
   audioEndTimer=null;
+  AudioEngine.stop();
   activeNodes.forEach(node=>{try{node.stop()}catch(_){}});
   activeNodes=[];
   activePlayback=null;
@@ -176,31 +165,17 @@ function scheduleLessonSequence(audio, day, mode) {
   return pattern.length*step+.55;
 }
 
-async function toggleExample(mode, button) {
+function toggleExample(mode, button) {
   if (activePlayback && activePlayback.button===button) { stopPlayback(false); return; }
   stopPlayback(false);
-  try {
-    const audio=await ensureAudio();
-    const day=selectedDay||currentDay();
-    const duration=scheduleLessonSequence(audio,day,mode);
-    activePlayback={button,mode};
-    button.textContent="Ⅱ";
-    button.setAttribute("aria-label","暂停播放");
-    if(mode==="hero") $("piano-roll").classList.add("is-playing");
-    if(mode==="track") $("waveform").classList.add("is-playing");
-    if(mode==="lesson") {
-      lessonAudioPlayed=true;
-      $("lesson-audio-status").textContent="播放中…再次点击可暂停";
-      const bar=$("lesson-audio-bar");
-      bar.style.transition="none";
-      bar.style.width="0";
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.transition=`width ${duration}s linear`;bar.style.width="100%"}));
-    }
-    audioEndTimer=setTimeout(()=>stopPlayback(true),duration*1000);
-  } catch (_) {
-    resetAudioUI(false);
-    $("lesson-audio-status").textContent="浏览器未能启动声音，请检查是否静音后重试";
-  }
+  const day=selectedDay||currentDay();
+  const phase=lessons[day-1].phaseIndex;
+  activePlayback={button,mode};
+  button.textContent="Ⅱ";
+  button.setAttribute("aria-label","暂停播放");
+  if(mode==="hero") $("piano-roll").classList.add("is-playing");
+  if(mode==="track") $("waveform").classList.add("is-playing");
+  AudioEngine.playLesson(day,phase,{onEnd:()=>stopPlayback(true),onError:()=>{$("audio-status").textContent="播放失败：请检查标签页是否静音";stopPlayback(false)}});
 }
 
 function openLesson(day) {
@@ -220,11 +195,12 @@ function openLesson(day) {
   $("reader-concepts").innerHTML = guide.concepts.map(item=>`<li>${item}</li>`).join("");
   $("reader-example").textContent = guide.example;
   $("reader-listen").textContent = guide.listen;
-  $("reader-practice").innerHTML = guide.practice.map(item=>`<li>${item}</li>`).join("");
+  $("creation-prompt").textContent = guide.practice.join(" → ");
   $("reader-deliverable").textContent = guide.deliverable;
   $("previous-day").disabled = day===1;
   $("next-day").disabled = day===100;
   $("notice").hidden = true;
+  InteractiveCourse.prepare(day,lesson,isDone?4:savedStep,()=>{if(selectedDay===day)renderCourseStep()});
   renderCourseStep();
   $("lesson-modal").hidden = false;
   document.body.classList.add("modal-open");
@@ -234,9 +210,8 @@ function openLesson(day) {
 function renderCourseStep() {
   const labels=["学习","例子","听辨","实操","打卡"];
   const isDone=selectedDay<=completedDays;
-  const isFuture=selectedDay>currentDay();
   const savedStep=Math.max(0,Math.min(Number(lessonSteps[selectedDay])||0,4));
-  const maxUnlocked=isDone||isFuture?4:Math.max(courseStep,savedStep);
+  const maxUnlocked=isDone?4:Math.max(courseStep,savedStep);
   $("course-progress").innerHTML=labels.map((label,index)=>`<button data-step="${index}" class="${index===courseStep?"active":""} ${isDone||index<maxUnlocked?"done":""}" ${index>maxUnlocked?"disabled":""}><i>${isDone||index<maxUnlocked?"✓":index+1}</i><span>${label}</span></button>`).join("");
   document.querySelectorAll("[data-course-panel]").forEach(panel=>panel.hidden=Number(panel.dataset.coursePanel)!==courseStep);
   document.querySelectorAll("[data-step]").forEach(button=>button.addEventListener("click",()=>{
@@ -250,14 +225,14 @@ function renderCourseStep() {
   const nextLabels=["学完概念，继续 →","看懂例子，继续 →","完成听辨，继续 →","完成实操，去打卡 →",""];
   $("course-next").textContent=nextLabels[courseStep];
   $("course-next").hidden=courseStep===4;
+  $("course-next").classList.toggle("ready",isDone||InteractiveCourse.isComplete(selectedDay,courseStep));
   renderTasks();
 }
 
 function advanceCourse() {
   if(courseStep>=4)return;
-  if(courseStep===2&&selectedDay===currentDay()&&!lessonAudioPlayed){
-    $("lesson-audio-status").textContent="请先点击播放，听完或开始听辨后再继续";
-    $("lesson-audio-play").focus();
+  if(selectedDay>completedDays&&!InteractiveCourse.isComplete(selectedDay,courseStep)){
+    InteractiveCourse.showRequired(selectedDay,courseStep);
     return;
   }
   if(selectedDay===currentDay()){
@@ -310,7 +285,6 @@ function closeModal() { stopPlayback(false);$("lesson-modal").hidden=true;docume
 $("waveform").innerHTML = Array.from({length:70},(_,i)=>`<i style="height:${18+((i*17)%58)}%"></i>`).join("")+"<b></b>";
 $("music-play").addEventListener("click",event=>toggleExample("hero",event.currentTarget));
 $("track-play").addEventListener("click",event=>toggleExample("track",event.currentTarget));
-$("lesson-audio-play").addEventListener("click",event=>toggleExample("lesson",event.currentTarget));
 $("start-today").addEventListener("click",()=>openLesson(currentDay()));
 $("modal-close").addEventListener("click",closeModal);
 $("lesson-modal").addEventListener("click",event=>{if(event.target===$("lesson-modal"))closeModal()});

@@ -71,33 +71,34 @@
         <div class="course-progress" id="course-progress" aria-label="今日课程步骤"></div>
 
         <div class="course-panel" data-course-panel="0">
-          <p class="reader-number">STEP 1 · 核心讲解</p>
-          <h3>先理解今天的概念</h3>
+          <p class="reader-number">STEP 1 · 概念挑战</p>
+          <h3>看一张知识卡，马上作答</h3>
           <p class="reader-summary" id="reader-summary"></p>
           <ul id="reader-concepts"></ul>
+          <div id="concept-interaction"></div>
         </div>
 
         <div class="course-panel example-card" data-course-panel="1" hidden>
-          <p class="reader-number">STEP 2 · 音乐例子</p>
-          <h3>把抽象知识变成声音</h3>
+          <p class="reader-number">STEP 2 · 互动实验</p>
+          <h3>不用只读，直接操作</h3>
           <p id="reader-example"></p>
+          <div id="example-interaction"></div>
         </div>
 
         <div class="course-panel listen-card" data-course-panel="2" hidden>
           <p class="reader-number">STEP 3 · 听辨练习</p>
           <h3>先播放，再带着问题听</h3>
           <p id="reader-listen"></p>
-          <div class="lesson-audio-player">
-            <button id="lesson-audio-play" aria-label="播放今日音乐示例">▶</button>
-            <div><strong id="lesson-audio-title">今日声音示例</strong><span id="lesson-audio-status">点击播放 · 约 8 秒</span><i><b id="lesson-audio-bar"></b></i></div>
-          </div>
-          <p class="audio-tip">声音由浏览器实时生成，无需下载外部音频。建议佩戴耳机。</p>
+          <div class="native-audio-box"><strong>今日声音示例</strong><audio id="lesson-native-audio" controls preload="metadata" playsinline></audio><span>这是浏览器原生播放器；请点击三角形播放。</span></div>
+          <div id="ear-interaction"></div>
+          <p class="audio-tip">音频在页面内生成，不需要外部音频网站。若进度在走但没声音，请检查标签页和系统是否静音。</p>
         </div>
 
         <div class="course-panel practice-card" data-course-panel="3" hidden>
-          <p class="reader-number">STEP 4 · 动手练习</p>
-          <h3>现在轮到你完成</h3>
-          <ol id="reader-practice"></ol>
+          <p class="reader-number">STEP 4 · 创作挑战</p>
+          <h3>用实验台完成今日作品</h3>
+          <p id="creation-prompt"></p>
+          <div id="creation-interaction"></div>
           <div class="completion-standard"><small>完成标准</small><strong id="reader-deliverable"></strong></div>
         </div>
 
@@ -118,6 +119,7 @@
   </div>
 
   <script src="curriculum.js"></script>
+  <script src="interactive.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
