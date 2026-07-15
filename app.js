@@ -11,7 +11,7 @@ const phases = [
   {title:"完成与发布",range:"Day 91–100",description:"用可执行的反馈与修改流程完成作品，理解母带、导出和发布准备。",outcome:"发布你的第一首完整作品",days:["完成比完美更重要","三层反馈法","第一轮：结构修改","第二轮：编曲修改","第三轮：混音修改","母带到底做什么","响度、动态与导出","封面与作品说明","发布前最终清单","毕业作品：我的第一首歌"]}
 ];
 
-const lessons = phases.flatMap((phase, phaseIndex) => phase.days.map((title, index) => ({day:phaseIndex*10+index+1,phaseIndex,title,duration:25+((phaseIndex+index)%4)*5,description:phase.description})));
+const lessons = phases.flatMap((phase, phaseIndex) => phase.days.map((title, index) => ({day:phaseIndex*10+index+1,phaseIndex,title,duration:25+((phaseIndex+index)%4)*5,description:phase.description,guide:lessonGuides[phaseIndex*10+index]})));
 const chords = [{name:"C",degree:"I",mood:"明亮起点",notes:[261.63,329.63,392]},{name:"Am",degree:"vi",mood:"内敛转折",notes:[220,261.63,329.63]},{name:"F",degree:"IV",mood:"开阔铺陈",notes:[174.61,220,261.63]},{name:"G",degree:"V",mood:"期待回归",notes:[196,246.94,293.66]}];
 const milestoneData = [[20,"鼓组 Loop","建立稳定律动"],[40,"旋律和声 Demo","表达一个清晰情绪"],[70,"全曲编曲 V1","完成所有段落"],[100,"毕业作品","导出可分享成品"]];
 
@@ -91,10 +91,19 @@ function openLesson(day) {
   selectedDay = day;
   taskChecks = day<=completedDays?[true,true,true]:[false,false,false];
   const lesson = lessons[day-1];
+  const guide = lesson.guide;
   $("modal-kicker").textContent = `DAY ${String(day).padStart(2,"0")} · ${phases[lesson.phaseIndex].title}`;
   $("modal-title").textContent = lesson.title;
   $("modal-intro").textContent = lesson.description;
-  $("modal-goal").textContent = day%10===0?phases[lesson.phaseIndex].outcome:`把“${lesson.title}”用在一个 8 小节片段里`;
+  $("modal-goal").textContent = guide.deliverable;
+  $("reader-summary").textContent = guide.summary;
+  $("reader-concepts").innerHTML = guide.concepts.map(item=>`<li>${item}</li>`).join("");
+  $("reader-example").textContent = guide.example;
+  $("reader-listen").textContent = guide.listen;
+  $("reader-practice").innerHTML = guide.practice.map(item=>`<li>${item}</li>`).join("");
+  $("reader-deliverable").textContent = guide.deliverable;
+  $("previous-day").disabled = day===1;
+  $("next-day").disabled = day===100;
   $("notice").hidden = true;
   renderTasks();
   $("lesson-modal").hidden = false;
@@ -104,7 +113,8 @@ function openLesson(day) {
 
 function renderTasks() {
   const lesson = lessons[selectedDay-1];
-  const taskData = [{tag:"学",time:"10 分钟",text:`理解「${lesson.title}」的一个核心概念`},{tag:"听",time:"8 分钟",text:"从一首喜欢的歌里找到今天的知识点"},{tag:"做",time:`${lesson.duration-18} 分钟`,text:"在自己的工程里完成一个 8 小节练习"}];
+  const guide = lesson.guide;
+  const taskData = [{tag:"学",time:"10 分钟",text:`读完「${lesson.title}」，能复述至少两个核心知识点`},{tag:"听",time:"8 分钟",text:guide.listen},{tag:"做",time:`${lesson.duration-18} 分钟`,text:guide.deliverable}];
   $("daily-tasks").innerHTML = taskData.map((task,index)=>`<label class="${taskChecks[index]?"checked":""}" data-task="${index}"><input type="checkbox" ${taskChecks[index]?"checked":""} ${selectedDay>currentDay()?"disabled":""}><span>${task.tag}</span><div><strong>${task.text}</strong><small>${task.time}</small></div><i>${taskChecks[index]?"✓":""}</i></label>`).join("");
   document.querySelectorAll("[data-task]").forEach(label=>label.addEventListener("click",event=>{if(event.target.tagName==="INPUT")return;event.preventDefault();if(selectedDay>currentDay())return;const index=Number(label.dataset.task);taskChecks[index]=!taskChecks[index];renderTasks()}));
   const button = $("complete-button");
@@ -139,6 +149,8 @@ $("start-today").addEventListener("click",()=>openLesson(currentDay()));
 $("modal-close").addEventListener("click",closeModal);
 $("lesson-modal").addEventListener("click",event=>{if(event.target===$("lesson-modal"))closeModal()});
 $("complete-button").addEventListener("click",completeToday);
+$("previous-day").addEventListener("click",()=>{if(selectedDay>1)openLesson(selectedDay-1)});
+$("next-day").addEventListener("click",()=>{if(selectedDay<100)openLesson(selectedDay+1)});
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("lesson-modal").hidden)closeModal()});
 
 renderDashboard();renderRoadmap();renderChordPads();

@@ -60,9 +60,44 @@
   <footer><div><span class="brand-note" aria-hidden="true">♪</span><strong>百日作曲实验室</strong></div><p>完成，比完美更重要。今天只写下一个音符，也算开始。</p><a href="#today">回到今天 ↑</a></footer>
 
   <div class="lesson-modal" id="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
-    <div class="modal-card panel"><button class="modal-close" id="modal-close" aria-label="关闭课程">×</button><p class="eyebrow" id="modal-kicker"></p><h2 id="modal-title"></h2><p class="modal-intro" id="modal-intro"></p><div class="lesson-goal"><small>今天的目标</small><strong id="modal-goal"></strong></div><div class="daily-tasks" id="daily-tasks"></div><p class="notice" id="notice" role="status" hidden></p><button class="complete-button" id="complete-button">完成今天并打卡</button><p class="save-note">进度会自动保存在这台设备上。</p></div>
+    <div class="modal-card panel">
+      <button class="modal-close" id="modal-close" aria-label="关闭课程">×</button>
+      <p class="eyebrow" id="modal-kicker"></p>
+      <h2 id="modal-title"></h2>
+      <p class="modal-intro" id="modal-intro"></p>
+      <div class="lesson-goal"><small>今天的目标</small><strong id="modal-goal"></strong></div>
+
+      <div class="lesson-reader">
+        <section class="reader-card">
+          <p class="reader-number">01 · 核心讲解</p>
+          <p class="reader-summary" id="reader-summary"></p>
+          <ul id="reader-concepts"></ul>
+        </section>
+        <section class="reader-card example-card">
+          <p class="reader-number">02 · 音乐例子</p>
+          <p id="reader-example"></p>
+        </section>
+        <section class="reader-card listen-card">
+          <p class="reader-number">03 · 带着问题听</p>
+          <p id="reader-listen"></p>
+        </section>
+        <section class="reader-card practice-card">
+          <p class="reader-number">04 · 跟着做</p>
+          <ol id="reader-practice"></ol>
+        </section>
+        <div class="completion-standard"><small>完成标准</small><strong id="reader-deliverable"></strong></div>
+      </div>
+
+      <h3 class="checkin-title">今日打卡任务</h3>
+      <div class="daily-tasks" id="daily-tasks"></div>
+      <p class="notice" id="notice" role="status" hidden></p>
+      <button class="complete-button" id="complete-button">完成今天并打卡</button>
+      <div class="lesson-nav"><button id="previous-day">← 上一天</button><button id="next-day">下一天 →</button></div>
+      <p class="save-note">进度会自动保存在这台设备上。</p>
+    </div>
   </div>
 
+  <script src="curriculum.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
