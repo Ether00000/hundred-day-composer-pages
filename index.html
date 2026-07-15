@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b0a">
+  <meta name="description" content="从零开始，用 100 天完成你的第一首原创作品。">
+  <title>百日作曲实验室</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#today" aria-label="百日作曲实验室首页"><span class="brand-grid" aria-hidden="true">⠿</span><span class="brand-note" aria-hidden="true">♪</span><strong>百日作曲实验室</strong></a>
+    <nav aria-label="主导航"><a class="active" href="#today">今日学习</a><a href="#roadmap">课程地图</a><a href="#works">作品集</a></nav>
+    <div class="header-progress" id="header-progress" aria-label="课程进度"><span id="header-day">Day 1/100</span><span class="progress-track"><i id="header-bar"></i></span><strong id="header-percent">0%</strong></div>
+  </header>
+
+  <main>
+    <section class="hero" id="today">
+      <div class="hero-copy">
+        <p class="eyebrow">100 DAYS · COMPOSE YOUR FIRST TRACK</p>
+        <h1>从第一个音符，<br>到第一首完整作品</h1>
+        <p class="hero-intro">每天 25–40 分钟，按“学一点、听一点、做一点”的节奏完成创作。100 天后，带走一首真正属于你的作品。</p>
+        <div class="hero-actions"><button class="primary-button" id="start-today">开始第 1 天 <span aria-hidden="true">▶</span></button><a class="text-button" href="#roadmap">查看课程地图 <span aria-hidden="true">→</span></a></div>
+      </div>
+
+      <article class="lesson-card panel">
+        <div class="lesson-kicker"><span aria-hidden="true">▣</span> 今日课程 <b aria-hidden="true">→</b></div>
+        <h2 id="today-title">声音的四个维度</h2><p class="duration" id="today-meta">◷ 25分钟 · 第 1 阶段</p>
+        <div class="lesson-steps" aria-label="今日任务共 3 步"><span class="current">学</span><span>听</span><span>做</span></div>
+        <div class="piano-roll" id="piano-roll" aria-label="互动钢琴卷帘示例">
+          <div class="piano-keys"><span>C5</span><span>C4</span><span>C3</span></div>
+          <div class="note-grid"><i class="playhead"></i><b style="top:18%;left:58%;width:14%"></b><b style="top:29%;left:22%;width:18%"></b><b style="top:38%;left:47%;width:21%"></b><b style="top:48%;left:69%;width:17%"></b><b style="top:59%;left:32%;width:16%"></b><b style="top:69%;left:12%;width:20%"></b><b style="top:78%;left:55%;width:23%"></b></div>
+          <button class="roll-play" id="music-play" aria-label="播放音乐示例">▶</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="stats-grid" aria-label="学习概览">
+      <article class="panel progress-panel"><div class="panel-heading"><span aria-hidden="true">▥</span> 学习进度</div><div class="stat-line"><span id="stat-day">Day 0/100</span><strong id="stat-percent">0%</strong></div><div class="segment-progress" id="segments" aria-label="学习进度条"></div><div class="scale"><span>1</span><span>25</span><span>50</span><span>75</span><span>100</span></div></article>
+      <article class="panel streak-panel"><div class="panel-heading"><span aria-hidden="true">♨</span> 连续打卡</div><strong class="streak-count"><span id="streak-count">0</span><small>天</small></strong><div class="week-row" id="week-row"></div></article>
+      <article class="panel audio-panel" id="works"><div class="audio-heading"><span>♫ &nbsp;你的创作片段</span><small id="audio-status">等待第一段录音</small></div><div class="waveform" id="waveform" aria-hidden="true"></div><div class="audio-controls"><button aria-label="上一段">◀</button><button class="main-play" id="track-play" aria-label="播放创作片段">▶</button><button aria-label="下一段">▶</button><span class="volume" aria-hidden="true">⌁ <i></i></span></div></article>
+    </section>
+
+    <section class="lab-section" aria-labelledby="lab-title">
+      <div class="section-heading"><div><p class="section-number">LISTEN · 01</p><h2 id="lab-title">先用耳朵理解和声</h2></div><p>依次点击 I–vi–IV–V，听听四个和弦怎样从出发、转折走向期待。没有乐器，也可以马上开始。</p></div>
+      <div class="chord-lab panel"><div class="chord-info"><span>互动练习</span><h3>C 大调情绪进行</h3><p>建议戴上耳机，每个和弦至少听两遍。第二遍时，用一个词描述你的感觉。</p><div class="chord-path">I <i></i> vi <i></i> IV <i></i> V</div></div><div class="chord-pads" id="chord-pads"></div></div>
+    </section>
+
+    <section class="roadmap-section" id="roadmap" aria-labelledby="roadmap-title">
+      <div class="section-heading"><div><p class="section-number">ROADMAP · 100 DAYS</p><h2 id="roadmap-title">十个阶段，一首完整作品</h2></div><p>课程覆盖从音乐基础、旋律与和声，到编曲、录音、混音和最终发布。每十天产出一个看得见的小作品。</p></div>
+      <div class="phase-tabs" id="phase-tabs" role="tablist" aria-label="课程阶段"></div>
+      <div class="phase-summary panel" id="phase-summary"></div>
+      <div class="lesson-grid" id="lesson-grid"></div>
+    </section>
+
+    <section class="milestones" aria-labelledby="milestone-title"><div class="section-heading"><div><p class="section-number">OUTPUT · NOT HOMEWORK</p><h2 id="milestone-title">你会留下这些作品</h2></div><p>每次练习都进入最终作品，不做用完就丢的作业。</p></div><div class="milestone-grid" id="milestones"></div></section>
+  </main>
+
+  <footer><div><span class="brand-note" aria-hidden="true">♪</span><strong>百日作曲实验室</strong></div><p>完成，比完美更重要。今天只写下一个音符，也算开始。</p><a href="#today">回到今天 ↑</a></footer>
+
+  <div class="lesson-modal" id="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-card panel"><button class="modal-close" id="modal-close" aria-label="关闭课程">×</button><p class="eyebrow" id="modal-kicker"></p><h2 id="modal-title"></h2><p class="modal-intro" id="modal-intro"></p><div class="lesson-goal"><small>今天的目标</small><strong id="modal-goal"></strong></div><div class="daily-tasks" id="daily-tasks"></div><p class="notice" id="notice" role="status" hidden></p><button class="complete-button" id="complete-button">完成今天并打卡</button><p class="save-note">进度会自动保存在这台设备上。</p></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
