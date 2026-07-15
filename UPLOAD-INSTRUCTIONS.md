@@ -11,6 +11,7 @@
    - `styles.css`
    - `app.js`
    - `curriculum.js`
+   - `interactive.js`
    - `.github/workflows/pages.yml`
 4. 点击 **Commit changes**。
 5. 打开仓库的 **Actions** 页面，等待 **Deploy GitHub Pages** 任务完成。

@@ -20,14 +20,21 @@ try { saved = JSON.parse(localStorage.getItem("composer-learning-state") || "{}"
 let completedDays = Math.min(Number(saved.completedDays)||0,100);
 let streak = Number(saved.streak)||0;
 let lastCheckin = saved.lastCheckin||"";
+let lessonSteps = saved.lessonSteps && typeof saved.lessonSteps === "object" ? saved.lessonSteps : {};
 let selectedPhase = 0;
 let selectedDay = null;
 let taskChecks = [false,false,false];
-let playing = false;
+let courseStep = 0;
+let lessonAudioPlayed = false;
+let audioContext = null;
+let activeNodes = [];
+let activePlayback = null;
+let audioEndTimer = null;
 
 const $ = (id) => document.getElementById(id);
 const currentDay = () => Math.min(completedDays + 1, 100);
 const localDate = () => new Date().toLocaleDateString("en-CA");
+const saveState = () => localStorage.setItem("composer-learning-state",JSON.stringify({completedDays,streak,lastCheckin,lessonSteps}));
 
 function renderDashboard() {
   const day = currentDay();
@@ -62,34 +69,122 @@ function renderChordPads() {
   document.querySelectorAll("[data-chord]").forEach(button=>button.addEventListener("click",()=>{const chord=chords.find(c=>c.name===button.dataset.chord);playChord(chord,button)}));
 }
 
+async function ensureAudio() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) throw new Error("当前浏览器不支持 Web Audio");
+  if (!audioContext) audioContext = new AudioCtx();
+  if (audioContext.state === "suspended") await audioContext.resume();
+  return audioContext;
+}
+
 function playChord(chord, button) {
   document.querySelectorAll("[data-chord]").forEach(el=>el.classList.remove("active"));
   button.classList.add("active");
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) return;
-  const audio = new AudioCtx();
-  const master = audio.createGain();
-  master.gain.setValueAtTime(.0001,audio.currentTime);
-  master.gain.exponentialRampToValueAtTime(.12,audio.currentTime+.03);
-  master.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+1.2);
-  master.connect(audio.destination);
-  chord.notes.forEach((frequency,index)=>{const oscillator=audio.createOscillator();oscillator.type=index===0?"triangle":"sine";oscillator.frequency.value=frequency;oscillator.connect(master);oscillator.start(audio.currentTime+index*.025);oscillator.stop(audio.currentTime+1.25)});
-  setTimeout(()=>{button.classList.remove("active");audio.close()},1250);
+  AudioEngine.playChord(chord.notes,1.25,{onError:()=>button.classList.remove("active")});
+  setTimeout(()=>button.classList.remove("active"),1250);
 }
 
-function togglePlay() {
-  playing = !playing;
-  $("piano-roll").classList.toggle("is-playing",playing);
-  $("waveform").classList.toggle("is-playing",playing);
-  $("music-play").textContent = playing ? "Ⅱ" : "▶";
-  $("music-play").setAttribute("aria-label",playing?"暂停音乐示例":"播放音乐示例");
-  $("track-play").textContent = playing ? "Ⅱ" : "▶";
-  $("track-play").setAttribute("aria-label",playing?"暂停创作片段":"播放创作片段");
+const midiFrequency = note => 440 * Math.pow(2,(note-69)/12);
+
+function scheduleVoice(audio, frequency, start, duration, type="triangle", level=.065) {
+  const oscillator=audio.createOscillator();
+  const gain=audio.createGain();
+  oscillator.type=type;
+  oscillator.frequency.setValueAtTime(frequency,start);
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.exponentialRampToValueAtTime(level,start+.025);
+  gain.gain.exponentialRampToValueAtTime(Math.max(level*.55,.0002),start+Math.max(.05,duration*.55));
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  oscillator.connect(gain).connect(audio.destination);
+  oscillator.start(start);
+  oscillator.stop(start+duration+.03);
+  activeNodes.push(oscillator);
+}
+
+function scheduleKick(audio, start) {
+  const oscillator=audio.createOscillator();
+  const gain=audio.createGain();
+  oscillator.type="sine";
+  oscillator.frequency.setValueAtTime(125,start);
+  oscillator.frequency.exponentialRampToValueAtTime(48,start+.16);
+  gain.gain.setValueAtTime(.16,start);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+.22);
+  oscillator.connect(gain).connect(audio.destination);
+  oscillator.start(start);
+  oscillator.stop(start+.24);
+  activeNodes.push(oscillator);
+}
+
+function resetAudioUI(finished=false) {
+  $("piano-roll").classList.remove("is-playing");
+  $("waveform").classList.remove("is-playing");
+  $("music-play").textContent="▶";
+  $("track-play").textContent="▶";
+  $("music-play").setAttribute("aria-label","播放音乐示例");
+  $("track-play").setAttribute("aria-label","播放创作片段");
+  if(finished)$("audio-status").textContent="播放完成 · 可再次试听";
+}
+
+function stopPlayback(finished=false) {
+  if (audioEndTimer) clearTimeout(audioEndTimer);
+  audioEndTimer=null;
+  AudioEngine.stop();
+  activeNodes.forEach(node=>{try{node.stop()}catch(_){}});
+  activeNodes=[];
+  activePlayback=null;
+  resetAudioUI(finished);
+}
+
+function scheduleLessonSequence(audio, day, mode) {
+  const lesson=lessons[day-1];
+  const phase=lesson.phaseIndex;
+  const patterns=[
+    [0,1,2,4,2,1,0,-1,0,2,4,5,4,2,1,0],
+    [0,-1,0,2,-1,2,4,-1,4,2,1,-1,2,1,0,-1],
+    [0,2,4,2,5,4,2,1,0,1,2,4,5,4,2,0],
+    [0,4,2,5,4,2,1,2,0,2,5,4,2,1,0,-1]
+  ];
+  const scale=phase===2||phase===9?[0,2,3,5,7,8,10,12]:[0,2,4,5,7,9,11,12];
+  const pattern=patterns[(day-1)%patterns.length];
+  const root=60+[0,2,5,7][phase%4];
+  const type=["sine","triangle","triangle","sine","triangle","sawtooth","square","triangle","sine","triangle"][phase];
+  const step=.43;
+  const start=audio.currentTime+.07;
+  pattern.forEach((degree,index)=>{
+    if (degree<0) return;
+    const note=root+scale[degree%scale.length]+(degree>=scale.length?12:0);
+    const accent=index%4===0?1.2:1;
+    scheduleVoice(audio,midiFrequency(note),start+index*step,step*.82,type,.055*accent);
+  });
+  const roots=[0,9,5,7];
+  roots.forEach((offset,index)=>{
+    const chordStart=start+index*step*4;
+    [0,4,7].forEach((interval,n)=>scheduleVoice(audio,midiFrequency(root-12+offset+interval),chordStart,step*3.6,n===0?"triangle":"sine",mode==="track"?.026:.018));
+    if (mode==="track"||phase===1||phase===6) scheduleKick(audio,chordStart);
+  });
+  return pattern.length*step+.55;
+}
+
+function toggleExample(mode, button) {
+  if (activePlayback && activePlayback.button===button) { stopPlayback(false); return; }
+  stopPlayback(false);
+  const day=selectedDay||currentDay();
+  const phase=lessons[day-1].phaseIndex;
+  activePlayback={button,mode};
+  button.textContent="Ⅱ";
+  button.setAttribute("aria-label","暂停播放");
+  if(mode==="hero") $("piano-roll").classList.add("is-playing");
+  if(mode==="track") $("waveform").classList.add("is-playing");
+  AudioEngine.playLesson(day,phase,{onEnd:()=>stopPlayback(true),onError:()=>{$("audio-status").textContent="播放失败：请检查标签页是否静音";stopPlayback(false)}});
 }
 
 function openLesson(day) {
   selectedDay = day;
-  taskChecks = day<=completedDays?[true,true,true]:[false,false,false];
+  const savedStep=Math.max(0,Math.min(Number(lessonSteps[day])||0,4));
+  const isDone=day<=completedDays;
+  courseStep=isDone?0:day===currentDay()?savedStep:0;
+  taskChecks=isDone?[true,true,true]:day===currentDay()?[savedStep>=1,savedStep>=3,savedStep>=4]:[false,false,false];
+  lessonAudioPlayed=isDone||savedStep>=3;
   const lesson = lessons[day-1];
   const guide = lesson.guide;
   $("modal-kicker").textContent = `DAY ${String(day).padStart(2,"0")} · ${phases[lesson.phaseIndex].title}`;
@@ -100,27 +195,71 @@ function openLesson(day) {
   $("reader-concepts").innerHTML = guide.concepts.map(item=>`<li>${item}</li>`).join("");
   $("reader-example").textContent = guide.example;
   $("reader-listen").textContent = guide.listen;
-  $("reader-practice").innerHTML = guide.practice.map(item=>`<li>${item}</li>`).join("");
+  $("creation-prompt").textContent = guide.practice.join(" → ");
   $("reader-deliverable").textContent = guide.deliverable;
   $("previous-day").disabled = day===1;
   $("next-day").disabled = day===100;
   $("notice").hidden = true;
-  renderTasks();
+  InteractiveCourse.prepare(day,lesson,isDone?4:savedStep,()=>{if(selectedDay===day)renderCourseStep()});
+  renderCourseStep();
   $("lesson-modal").hidden = false;
   document.body.classList.add("modal-open");
   $("modal-close").focus();
+}
+
+function renderCourseStep() {
+  const labels=["学习","例子","听辨","实操","打卡"];
+  const isDone=selectedDay<=completedDays;
+  const savedStep=Math.max(0,Math.min(Number(lessonSteps[selectedDay])||0,4));
+  const maxUnlocked=isDone?4:Math.max(courseStep,savedStep);
+  $("course-progress").innerHTML=labels.map((label,index)=>`<button data-step="${index}" class="${index===courseStep?"active":""} ${isDone||index<maxUnlocked?"done":""}" ${index>maxUnlocked?"disabled":""}><i>${isDone||index<maxUnlocked?"✓":index+1}</i><span>${label}</span></button>`).join("");
+  document.querySelectorAll("[data-course-panel]").forEach(panel=>panel.hidden=Number(panel.dataset.coursePanel)!==courseStep);
+  document.querySelectorAll("[data-step]").forEach(button=>button.addEventListener("click",()=>{
+    if(Number(button.dataset.step)>maxUnlocked)return;
+    if(activePlayback?.mode==="lesson")stopPlayback(false);
+    courseStep=Number(button.dataset.step);
+    renderCourseStep();
+  }));
+  $("course-position").textContent=`${courseStep+1} / 5`;
+  $("course-previous").disabled=courseStep===0;
+  const nextLabels=["学完概念，继续 →","看懂例子，继续 →","完成听辨，继续 →","完成实操，去打卡 →",""];
+  $("course-next").textContent=nextLabels[courseStep];
+  $("course-next").hidden=courseStep===4;
+  $("course-next").classList.toggle("ready",isDone||InteractiveCourse.isComplete(selectedDay,courseStep));
+  renderTasks();
+}
+
+function advanceCourse() {
+  if(courseStep>=4)return;
+  if(selectedDay>completedDays&&!InteractiveCourse.isComplete(selectedDay,courseStep)){
+    InteractiveCourse.showRequired(selectedDay,courseStep);
+    return;
+  }
+  if(selectedDay===currentDay()){
+    if(courseStep===0)taskChecks[0]=true;
+    if(courseStep===2)taskChecks[1]=true;
+    if(courseStep===3)taskChecks[2]=true;
+  }
+  if(activePlayback?.mode==="lesson")stopPlayback(false);
+  courseStep=Math.min(courseStep+1,4);
+  if(selectedDay===currentDay()){
+    lessonSteps[selectedDay]=Math.max(Number(lessonSteps[selectedDay])||0,courseStep);
+    saveState();
+  }
+  renderCourseStep();
+  $("modal-title").scrollIntoView({block:"start"});
 }
 
 function renderTasks() {
   const lesson = lessons[selectedDay-1];
   const guide = lesson.guide;
   const taskData = [{tag:"学",time:"10 分钟",text:`读完「${lesson.title}」，能复述至少两个核心知识点`},{tag:"听",time:"8 分钟",text:guide.listen},{tag:"做",time:`${lesson.duration-18} 分钟`,text:guide.deliverable}];
-  $("daily-tasks").innerHTML = taskData.map((task,index)=>`<label class="${taskChecks[index]?"checked":""}" data-task="${index}"><input type="checkbox" ${taskChecks[index]?"checked":""} ${selectedDay>currentDay()?"disabled":""}><span>${task.tag}</span><div><strong>${task.text}</strong><small>${task.time}</small></div><i>${taskChecks[index]?"✓":""}</i></label>`).join("");
-  document.querySelectorAll("[data-task]").forEach(label=>label.addEventListener("click",event=>{if(event.target.tagName==="INPUT")return;event.preventDefault();if(selectedDay>currentDay())return;const index=Number(label.dataset.task);taskChecks[index]=!taskChecks[index];renderTasks()}));
+  $("daily-tasks").innerHTML = taskData.map((task,index)=>`<label class="${taskChecks[index]?"checked":""} locked"><input type="checkbox" ${taskChecks[index]?"checked":""} disabled><span>${task.tag}</span><div><strong>${task.text}</strong><small>${task.time}</small></div><i>${taskChecks[index]?"✓":""}</i></label>`).join("");
   const button = $("complete-button");
-  button.disabled = selectedDay<currentDay();
-  button.className = "complete-button"+(selectedDay<currentDay()?" completed":selectedDay>currentDay()?" preview":"");
-  button.textContent = selectedDay<currentDay()?"这一天已完成 ✓":selectedDay>currentDay()?`这是预览 · 返回 Day ${currentDay()}`:completedDays===100?"100 天已全部完成":"完成今天并打卡";
+  const isDone=selectedDay<=completedDays;
+  button.disabled=isDone||(selectedDay===currentDay()&&!taskChecks.every(Boolean));
+  button.className="complete-button"+(isDone?" completed":selectedDay>currentDay()?" preview":"");
+  button.textContent=isDone?"这一天已完成 ✓":selectedDay>currentDay()?`这是预览 · 返回 Day ${currentDay()}`:"完成今天并打卡";
 }
 
 function completeToday() {
@@ -132,23 +271,26 @@ function completeToday() {
   const now=new Date(`${today}T00:00:00`);
   const gap=previous?Math.round((now-previous)/86400000):1;
   streak=lastCheckin===today?streak:gap===1?streak+1:1;
+  lessonSteps[selectedDay]=4;
   completedDays=Math.min(completedDays+1,100);
   lastCheckin=today;
-  localStorage.setItem("composer-learning-state",JSON.stringify({completedDays,streak,lastCheckin}));
+  saveState();
   $("notice").textContent=completedDays===100?"毕业了！你的第一首完整作品已经走完 100 天。":`Day ${selectedDay} 打卡成功，下一站是 Day ${completedDays+1}。`;
   $("notice").hidden=false;
-  renderDashboard();renderRoadmap();renderTasks();
+  renderDashboard();renderRoadmap();renderCourseStep();
 }
 
-function closeModal() { $("lesson-modal").hidden=true;document.body.classList.remove("modal-open");$("start-today").focus(); }
+function closeModal() { stopPlayback(false);$("lesson-modal").hidden=true;document.body.classList.remove("modal-open");$("start-today").focus(); }
 
 $("waveform").innerHTML = Array.from({length:70},(_,i)=>`<i style="height:${18+((i*17)%58)}%"></i>`).join("")+"<b></b>";
-$("music-play").addEventListener("click",togglePlay);
-$("track-play").addEventListener("click",togglePlay);
+$("music-play").addEventListener("click",event=>toggleExample("hero",event.currentTarget));
+$("track-play").addEventListener("click",event=>toggleExample("track",event.currentTarget));
 $("start-today").addEventListener("click",()=>openLesson(currentDay()));
 $("modal-close").addEventListener("click",closeModal);
 $("lesson-modal").addEventListener("click",event=>{if(event.target===$("lesson-modal"))closeModal()});
 $("complete-button").addEventListener("click",completeToday);
+$("course-next").addEventListener("click",advanceCourse);
+$("course-previous").addEventListener("click",()=>{if(courseStep>0){if(activePlayback?.mode==="lesson")stopPlayback(false);courseStep--;renderCourseStep()}});
 $("previous-day").addEventListener("click",()=>{if(selectedDay>1)openLesson(selectedDay-1)});
 $("next-day").addEventListener("click",()=>{if(selectedDay<100)openLesson(selectedDay+1)});
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("lesson-modal").hidden)closeModal()});
