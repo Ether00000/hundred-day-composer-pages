@@ -1,298 +1,185 @@
-const phases = [
-  {title:"声音与工具",range:"Day 1–10",description:"先会听、会操作，再开始写。认识 DAW、节拍、音高和最小创作流程。",outcome:"做出第一段 8 小节音乐草图",days:["声音的四个维度","认识你的 DAW","节拍与小节","音名与键盘","半音、全音与八度","第一次 MIDI 录入","速度与拍号","量化但不僵硬","搭出 4 小节循环","阶段作品：声音明信片"]},
-  {title:"节奏与律动",range:"Day 11–20",description:"用鼓点建立推动力，理解强弱拍、切分、律动与不同风格的节奏骨架。",outcome:"完成一段有层次的鼓组 Loop",days:["鼓组里的四个角色","四四拍的基本律动","八分与十六分音符","强拍、弱拍与重音","切分：制造向前感","Swing 与松紧感","Ghost Note 小幽灵","三种常见风格节奏","鼓组的加法与减法","阶段作品：会呼吸的节奏"]},
-  {title:"旋律写作",range:"Day 21–30",description:"从音阶出发，用动机、重复、变化和问答写出能记住的旋律。",outcome:"写出一条 16 小节主旋律",days:["大调音阶与音级","小调音阶与情绪","五声音阶快速上手","动机：旋律的种子","重复与微小变化","旋律的问与答","级进、跳进与轮廓","留白比音符更重要","为和弦写旋律","阶段作品：16 小节主题"]},
-  {title:"和声与情绪",range:"Day 31–40",description:"理解三和弦、调内和弦与功能，让和弦进行真正服务情绪。",outcome:"完成一版旋律与和声 Demo",days:["三和弦是怎样组成的","大三和弦与小三和弦","调内七个和弦","主、下属与属功能","I–V–vi–IV 为什么好用","和弦转位让连接更顺","七和弦增加色彩","借用和弦制造惊喜","为旋律配和弦","阶段作品：情绪和声 Demo"]},
-  {title:"曲式与叙事",range:"Day 41–50",description:"把好听的循环发展成完整歌曲，用段落、能量和对比讲故事。",outcome:"画出自己的完整曲式蓝图",days:["循环为何容易无聊","前奏的三种任务","主歌：建立世界","预副歌：蓄力","副歌：兑现期待","桥段：打开新视角","重复中的变化","能量曲线怎么画","拆解一首喜欢的歌","阶段作品：完整曲式蓝图"]},
-  {title:"音色与设计",range:"Day 51–60",description:"学会挑选、塑造与分层音色，建立服务作品而非堆砌预设的审美。",outcome:"建立一套统一的歌曲音色板",days:["音色选择的三个问题","振荡器与波形","包络：声音的形状","滤波器与明暗","LFO 让声音动起来","采样与切片","Layer 分层的边界","Bass 音色与低频角色","空间系效果入门","阶段作品：专属音色板"]},
-  {title:"编曲与配器",range:"Day 61–70",description:"管理频率、节奏与声部角色，让不同乐器在同一首歌里各司其职。",outcome:"完成第一版全曲编曲",days:["编曲就是分配注意力","低频：鼓和 Bass 的合作","中频：和声的主体","高频：空气与点缀","主角、配角与背景","声部进行与避让","填充句与过门","自动化塑造变化","做减法的编曲检查","阶段作品：全曲编曲 V1"]},
-  {title:"录音与编辑",range:"Day 71–80",description:"掌握家庭录音、素材整理、音高校正与节奏编辑的实用工作流。",outcome:"得到干净、自然、可混音的素材",days:["信号链与增益","家庭录音空间","人声录音准备","多 Take 与 Comp","噪声和呼吸的处理","节奏编辑不失自然","基础音高校正","吉他与真实乐器录音","文件命名与工程整理","阶段作品：整理可混音素材"]},
-  {title:"混音与空间",range:"Day 81–90",description:"从音量平衡开始，逐步使用 EQ、压缩、声像和空间效果完成混音。",outcome:"输出一版清晰、有层次的混音",days:["先只用音量做平衡","声像与宽度","EQ：先解决再美化","压缩：控制与律动","瞬态与冲击力","混响创造空间","Delay 创造深度","总线与分组","参考曲与多设备检查","阶段作品：全曲混音 V1"]},
-  {title:"完成与发布",range:"Day 91–100",description:"用可执行的反馈与修改流程完成作品，理解母带、导出和发布准备。",outcome:"发布你的第一首完整作品",days:["完成比完美更重要","三层反馈法","第一轮：结构修改","第二轮：编曲修改","第三轮：混音修改","母带到底做什么","响度、动态与导出","封面与作品说明","发布前最终清单","毕业作品：我的第一首歌"]}
+const phases=[
+  {title:"基础与 DAW",range:"Day 01–10",description:"认识声音、拍号、速度、音程与 MIDI，在真实工作流中完成第一个 8 小节声音片段。",outcome:"8 小节声音明信片",days:["声音的四个维度","认识 DAW 工作流","拍、小节与循环","音名与键盘地图","半音、全音与八度","MIDI 位置、时值与力度","速度与拍号","量化与演奏感","搭建第一个 Loop","阶段作品：声音明信片"]},
+  {title:"节奏与律动",range:"Day 11–20",description:"从鼓组角色与 Backbeat 出发，掌握细分、重音、切分、Swing、幽灵音和 Fill。",outcome:"会呼吸的完整鼓组",days:["鼓组的四个角色","Backbeat 骨架","八分与十六分细分","用力度设计重音","切分与反拍","Swing 的长短关系","Ghost Note","风格节奏：House","三档密度与 Fill","阶段作品：鼓组叙事"]},
+  {title:"旋律写作",range:"Day 21–30",description:"用音阶、动机、问答句、轮廓、留白与和弦音写出可记忆的完整主题。",outcome:"一条完整原创主题",days:["C 大调旋律","A 小调情绪","五声音阶 Hook","四音动机","动机的三个变体","问句与答句","旋律轮廓","让旋律呼吸","强拍和弦音","阶段作品：完整主题"]},
+  {title:"和声与进行",range:"Day 31–40",description:"从三和弦与调内和声出发，理解功能、流行进行、转位、七和弦和借用和弦。",outcome:"旋律和声 Demo",days:["根音、三音与五音","大和弦与小和弦","C 大调调内和弦","I–IV–V–I","I–V–vi–IV","转位与平滑连接","七和弦的色彩","借用 iv 和弦","为旋律配和弦","阶段作品：和声 Demo"]},
+  {title:"曲式与结构",range:"Day 41–50",description:"用段落职责、能量曲线、重复升级和参考曲分析，把循环扩展成一首歌。",outcome:"完整曲式蓝图",days:["四个段落职责","前奏的线索","两个不同主歌","预副歌蓄力","副歌兑现期待","桥段打开新视角","重复副歌升级","全曲能量线","参考曲结构分析","阶段作品：曲式蓝图"]},
+  {title:"音色与设计",range:"Day 51–60",description:"用振荡器、ADSR、滤波、LFO、采样切片和分层建立统一的专属音色板。",outcome:"六类专属音色板",days:["音色的角色","四种基础波形","ADSR：Pluck 与 Pad","滤波扫频","LFO 调制","采样与切片","三层复合音色","小音箱 Bass","空间的前后层次","阶段作品：音色板"]},
+  {title:"编曲与配器",range:"Day 61–70",description:"把注意力分配给低、中、高频与主配角，通过声部进行、Fill、自动化和减法完成编曲。",outcome:"全曲编曲 V1",days:["只保留一个主角","Kick 与 Bass 分工","中频声部避让","高频与段落明暗","主角、配角与背景","反向声部进行","空隙中的 Fill","三类自动化","Mute Test 做减法","阶段作品：编曲 V1"]},
+  {title:"录音与编辑",range:"Day 71–80",description:"建立安全增益与家庭录音流程，完成多 Take、Comp、自然修正、工程整理与 Stem 导出。",outcome:"可混音的干净素材",days:["安全输入增益","寻找最佳录音位置","人声录音设置","多 Take 与 Comp","噪声、呼吸与淡化","自然节奏编辑","自然音高校正","真实乐器拾音","工程命名与分组","阶段作品：Stem 验证"]},
+  {title:"混音与空间",range:"Day 81–90",description:"从音量与声像开始，用 EQ、压缩、瞬态、混响、Delay、总线和参考曲完成可翻译的混音。",outcome:"全曲混音 V1",days:["只用音量平衡","中心与两侧","问题导向 EQ","压缩与冲击力","瞬态塑形","短长混响层次","句尾 Delay Throw","功能总线与路由","参考曲与多设备","阶段作品：混音 V1"]},
+  {title:"完成与发布",range:"Day 91–100",description:"建立冻结与反馈机制，完成结构、编曲、混音、母带、导出、包装和发布。",outcome:"第一首完整原创作品",days:["定义完成标准","三层反馈法","冻结结构","冻结编曲","冻结混音","克制的母带链","响度、动态与导出","标题、封面与说明","发布前最终清单","毕业：发布第一首歌"]}
 ];
 
-const lessons = phases.flatMap((phase, phaseIndex) => phase.days.map((title, index) => ({day:phaseIndex*10+index+1,phaseIndex,title,duration:25+((phaseIndex+index)%4)*5,description:phase.description,guide:lessonGuides[phaseIndex*10+index]})));
-const chords = [{name:"C",degree:"I",mood:"明亮起点",notes:[261.63,329.63,392]},{name:"Am",degree:"vi",mood:"内敛转折",notes:[220,261.63,329.63]},{name:"F",degree:"IV",mood:"开阔铺陈",notes:[174.61,220,261.63]},{name:"G",degree:"V",mood:"期待回归",notes:[196,246.94,293.66]}];
-const milestoneData = [[20,"鼓组 Loop","建立稳定律动"],[40,"旋律和声 Demo","表达一个清晰情绪"],[70,"全曲编曲 V1","完成所有段落"],[100,"毕业作品","导出可分享成品"]];
+const lessons=lessonActivities.map((activity,index)=>({
+  ...activity,
+  phaseIndex:Math.floor(index/10),
+  title:phases[Math.floor(index/10)].days[index%10],
+  duration:25+(index%3)*5
+}));
 
-let saved = {};
-try { saved = JSON.parse(localStorage.getItem("composer-learning-state") || "{}"); } catch (_) {}
-let completedDays = Math.min(Number(saved.completedDays)||0,100);
-let streak = Number(saved.streak)||0;
-let lastCheckin = saved.lastCheckin||"";
-let lessonSteps = saved.lessonSteps && typeof saved.lessonSteps === "object" ? saved.lessonSteps : {};
-let selectedPhase = 0;
-let selectedDay = null;
-let taskChecks = [false,false,false];
-let courseStep = 0;
-let lessonAudioPlayed = false;
-let audioContext = null;
-let activeNodes = [];
-let activePlayback = null;
-let audioEndTimer = null;
+let stored={};
+try{stored=JSON.parse(localStorage.getItem("composer-learning-state")||"{}")}catch(_){stored={}}
+let completedDays=Math.min(100,Math.max(0,Number(stored.completedDays)||0));
+let streak=Math.max(0,Number(stored.streak)||0);
+let lastCheckin=stored.lastCheckin||"";
+let selectedPhase=Math.min(9,Math.floor(Math.min(completedDays,99)/10));
+let selectedDay=null;
+let validated=false;
+let homeObjectUrl=null;
+let savedRecords=[];
 
-const $ = (id) => document.getElementById(id);
-const currentDay = () => Math.min(completedDays + 1, 100);
-const localDate = () => new Date().toLocaleDateString("en-CA");
-const saveState = () => localStorage.setItem("composer-learning-state",JSON.stringify({completedDays,streak,lastCheckin,lessonSteps}));
+const $=id=>document.getElementById(id);
+const currentDay=()=>Math.min(100,completedDays+1);
+const dateKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const saveProgress=()=>localStorage.setItem("composer-learning-state",JSON.stringify({...stored,completedDays,streak,lastCheckin}));
+const toolName={tour:"DAW 导览",synth:"合成器",drums:"鼓机",piano:"钢琴卷帘",chords:"和弦轨",arrange:"编曲时间线",record:"录音台",mix:"混音台",finish:"发布控制台"};
 
-function renderDashboard() {
-  const day = currentDay();
-  const lesson = lessons[day-1];
-  $("header-day").textContent = `Day ${day}/100`;
-  $("header-percent").textContent = `${completedDays}%`;
-  $("header-bar").style.width = `${completedDays}%`;
-  $("header-progress").setAttribute("aria-label",`课程进度 ${completedDays}%`);
-  $("start-today").innerHTML = `开始第 ${day} 天 <span aria-hidden="true">▶</span>`;
-  $("today-title").textContent = lesson.title;
-  $("today-meta").textContent = `◷ ${lesson.duration}分钟 · 第 ${lesson.phaseIndex+1} 阶段`;
-  $("stat-day").textContent = `Day ${completedDays}/100`;
-  $("stat-percent").textContent = `${completedDays}%`;
-  $("streak-count").textContent = streak;
-  $("audio-status").textContent = completedDays < 10 ? "等待第一段录音" : "00:28 / 01:30";
-  $("segments").innerHTML = Array.from({length:25},(_,i)=>`<i class="${i<Math.ceil(completedDays/4)?"done":""}"></i>`).join("");
-  $("week-row").innerHTML = ["一","二","三","四","五","六","日"].map((d,i)=>`<span><i class="${i<Math.min(streak,7)?"checked":""}">${i<Math.min(streak,7)?"✓":"·"}</i><small>${d}</small></span>`).join("");
-  $("milestones").innerHTML = milestoneData.map(([dayNum,title,desc])=>`<article class="milestone-card panel"><span>DAY ${dayNum}</span><div class="disc" aria-hidden="true"><i></i></div><h3>${title}</h3><p>${desc}</p><small>${completedDays>=dayNum?"已解锁 ✓":`还需 ${dayNum-completedDays} 天`}</small></article>`).join("");
+function renderDashboard(){
+  const day=currentDay(),lesson=lessons[day-1],percent=completedDays;
+  $("header-day").textContent=`DAY ${String(day).padStart(2,"0")} / 100`;
+  $("header-percent").textContent=`${percent}%`;
+  $("header-bar").style.width=`${percent}%`;
+  $("stat-day").textContent=`${completedDays} / 100 DAYS`;
+  $("stat-percent").textContent=percent;
+  $("streak-count").textContent=streak;
+  $("start-today").innerHTML=`进入 Day ${String(day).padStart(2,"0")} 工作室 <span>→</span>`;
+  $("today-index").textContent=`DAY ${String(day).padStart(2,"0")} · ${phases[lesson.phaseIndex].title}`;
+  $("today-tool").textContent=toolName[lesson.tool];
+  $("today-title").textContent=lesson.mission;
+  $("today-principle").textContent=lesson.principle;
+  $("today-steps").innerHTML=lesson.steps.map(step=>`<li>${step}</li>`).join("");
+  $("segments").innerHTML=Array.from({length:25},(_,index)=>`<i class="${index<Math.ceil(completedDays/4)?"done":""}"></i>`).join("");
+  $("week-row").innerHTML=["一","二","三","四","五","六","日"].map((label,index)=>`<span><i class="${index<Math.min(streak,7)?"checked":""}">${index<Math.min(streak,7)?"✓":"·"}</i><small>${label}</small></span>`).join("");
 }
 
-function renderRoadmap() {
-  $("phase-tabs").innerHTML = phases.map((phase,i)=>`<button role="tab" aria-selected="${selectedPhase===i}" class="${selectedPhase===i?"active":""}" data-phase="${i}"><small>${String(i+1).padStart(2,"0")}</small><span>${phase.title}</span></button>`).join("");
-  const phase = phases[selectedPhase];
-  $("phase-summary").innerHTML = `<div><span>${phase.range}</span><h3>${phase.title}</h3><p>${phase.description}</p></div><div class="outcome"><small>阶段成果</small><strong>${phase.outcome}</strong></div>`;
-  $("lesson-grid").innerHTML = lessons.filter(l=>l.phaseIndex===selectedPhase).map(lesson=>{const status=lesson.day<=completedDays?"done":lesson.day===currentDay()?"current":"upcoming";return `<button class="roadmap-lesson ${status}" data-day="${lesson.day}"><span class="day-index">DAY ${String(lesson.day).padStart(2,"0")}</span><strong>${lesson.title}</strong><small>${lesson.duration} 分钟</small><i>${status==="done"?"✓ 已完成":status==="current"?"● 今日":"○ 可预览"}</i></button>`}).join("");
+function renderRoadmap(){
+  $("phase-tabs").innerHTML=phases.map((phase,index)=>`<button role="tab" aria-selected="${selectedPhase===index}" class="${selectedPhase===index?"active":""}" data-phase="${index}"><small>${String(index+1).padStart(2,"0")} · ${phase.range}</small><span>${phase.title}</span></button>`).join("");
+  const phase=phases[selectedPhase];
+  $("phase-summary").innerHTML=`<div><span>${phase.range} · PHASE ${String(selectedPhase+1).padStart(2,"0")}</span><h3>${phase.title}</h3><p>${phase.description}</p></div><div class="phase-outcome"><small>阶段作品</small><strong>${phase.outcome}</strong></div>`;
+  $("lesson-grid").innerHTML=lessons.filter(lesson=>lesson.phaseIndex===selectedPhase).map(lesson=>{
+    const status=lesson.day<=completedDays?"done":lesson.day===currentDay()?"current":"upcoming";
+    return `<button class="lesson-card ${status}" data-day="${lesson.day}"><span class="day">DAY ${String(lesson.day).padStart(2,"0")}</span><strong>${lesson.title}</strong><span class="tool">${toolName[lesson.tool]}</span><i>${status==="done"?"✓ 已通过":status==="current"?"● 今日任务":"○ 可预览"}</i></button>`;
+  }).join("");
   document.querySelectorAll("[data-phase]").forEach(button=>button.addEventListener("click",()=>{selectedPhase=Number(button.dataset.phase);renderRoadmap()}));
   document.querySelectorAll("[data-day]").forEach(button=>button.addEventListener("click",()=>openLesson(Number(button.dataset.day))));
 }
 
-function renderChordPads() {
-  $("chord-pads").innerHTML = chords.map(c=>`<button data-chord="${c.name}"><small>${c.degree}</small><strong>${c.name}</strong><span>${c.mood}</span></button>`).join("");
-  document.querySelectorAll("[data-chord]").forEach(button=>button.addEventListener("click",()=>{const chord=chords.find(c=>c.name===button.dataset.chord);playChord(chord,button)}));
-}
-
-async function ensureAudio() {
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) throw new Error("当前浏览器不支持 Web Audio");
-  if (!audioContext) audioContext = new AudioCtx();
-  if (audioContext.state === "suspended") await audioContext.resume();
-  return audioContext;
-}
-
-function playChord(chord, button) {
-  document.querySelectorAll("[data-chord]").forEach(el=>el.classList.remove("active"));
-  button.classList.add("active");
-  AudioEngine.playChord(chord.notes,1.25,{onError:()=>button.classList.remove("active")});
-  setTimeout(()=>button.classList.remove("active"),1250);
-}
-
-const midiFrequency = note => 440 * Math.pow(2,(note-69)/12);
-
-function scheduleVoice(audio, frequency, start, duration, type="triangle", level=.065) {
-  const oscillator=audio.createOscillator();
-  const gain=audio.createGain();
-  oscillator.type=type;
-  oscillator.frequency.setValueAtTime(frequency,start);
-  gain.gain.setValueAtTime(.0001,start);
-  gain.gain.exponentialRampToValueAtTime(level,start+.025);
-  gain.gain.exponentialRampToValueAtTime(Math.max(level*.55,.0002),start+Math.max(.05,duration*.55));
-  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
-  oscillator.connect(gain).connect(audio.destination);
-  oscillator.start(start);
-  oscillator.stop(start+duration+.03);
-  activeNodes.push(oscillator);
-}
-
-function scheduleKick(audio, start) {
-  const oscillator=audio.createOscillator();
-  const gain=audio.createGain();
-  oscillator.type="sine";
-  oscillator.frequency.setValueAtTime(125,start);
-  oscillator.frequency.exponentialRampToValueAtTime(48,start+.16);
-  gain.gain.setValueAtTime(.16,start);
-  gain.gain.exponentialRampToValueAtTime(.0001,start+.22);
-  oscillator.connect(gain).connect(audio.destination);
-  oscillator.start(start);
-  oscillator.stop(start+.24);
-  activeNodes.push(oscillator);
-}
-
-function resetAudioUI(finished=false) {
-  $("piano-roll").classList.remove("is-playing");
-  $("waveform").classList.remove("is-playing");
-  $("music-play").textContent="▶";
-  $("track-play").textContent="▶";
-  $("music-play").setAttribute("aria-label","播放音乐示例");
-  $("track-play").setAttribute("aria-label","播放创作片段");
-  if(finished)$("audio-status").textContent="播放完成 · 可再次试听";
-}
-
-function stopPlayback(finished=false) {
-  if (audioEndTimer) clearTimeout(audioEndTimer);
-  audioEndTimer=null;
-  AudioEngine.stop();
-  activeNodes.forEach(node=>{try{node.stop()}catch(_){}});
-  activeNodes=[];
-  activePlayback=null;
-  resetAudioUI(finished);
-}
-
-function scheduleLessonSequence(audio, day, mode) {
-  const lesson=lessons[day-1];
-  const phase=lesson.phaseIndex;
-  const patterns=[
-    [0,1,2,4,2,1,0,-1,0,2,4,5,4,2,1,0],
-    [0,-1,0,2,-1,2,4,-1,4,2,1,-1,2,1,0,-1],
-    [0,2,4,2,5,4,2,1,0,1,2,4,5,4,2,0],
-    [0,4,2,5,4,2,1,2,0,2,5,4,2,1,0,-1]
-  ];
-  const scale=phase===2||phase===9?[0,2,3,5,7,8,10,12]:[0,2,4,5,7,9,11,12];
-  const pattern=patterns[(day-1)%patterns.length];
-  const root=60+[0,2,5,7][phase%4];
-  const type=["sine","triangle","triangle","sine","triangle","sawtooth","square","triangle","sine","triangle"][phase];
-  const step=.43;
-  const start=audio.currentTime+.07;
-  pattern.forEach((degree,index)=>{
-    if (degree<0) return;
-    const note=root+scale[degree%scale.length]+(degree>=scale.length?12:0);
-    const accent=index%4===0?1.2:1;
-    scheduleVoice(audio,midiFrequency(note),start+index*step,step*.82,type,.055*accent);
+async function openLesson(day){
+  selectedDay=Math.max(1,Math.min(100,day));
+  const requestedDay=selectedDay;
+  validated=false;
+  const lesson=lessons[selectedDay-1],phase=phases[lesson.phaseIndex];
+  $("modal-kicker").textContent=`DAY ${String(selectedDay).padStart(2,"0")} · ${toolName[lesson.tool].toUpperCase()}`;
+  $("modal-title").textContent=lesson.title;
+  $("mission-text").textContent=lesson.mission;
+  $("mission-principle").textContent=lesson.principle;
+  $("mission-steps").innerHTML=lesson.steps.map(step=>`<li>${step}</li>`).join("");
+  $("previous-day").disabled=selectedDay===1;
+  $("next-day").disabled=selectedDay===100;
+  $("save-and-checkin").disabled=true;
+  $("save-and-checkin").textContent=selectedDay===currentDay()&&selectedDay>completedDays?"保存 WAV 并打卡":selectedDay<=completedDays?"保存新的作品版本":"保存练习（不计进度）";
+  setCheckState("neutral","尚未检测",`这是 Day ${selectedDay} 专属的${toolName[lesson.tool]}任务。完成右侧三步后再检查。`);
+  $("studio-root").innerHTML='<div class="studio-loading">正在载入工程与音频引擎…</div>';
+  let draft=ProjectStore.loadDraft(selectedDay),inherited=false;
+  if(!draft&&selectedDay>1){
+    const records=savedRecords.length?savedRecords:await ProjectStore.list();
+    const previous=records.find(record=>record.day<selectedDay&&record.project);
+    if(previous){draft={...previous.project,day:selectedDay};inherited=true}
+  }
+  if(selectedDay!==requestedDay)return;
+  ComposerStudio.mount("studio-root",lesson,draft,()=>{
+    if(validated){validated=false;$("save-and-checkin").disabled=true;setCheckState("neutral","作品已改变","很好，继续用耳朵调整。完成后请重新检测。")}
   });
-  const roots=[0,9,5,7];
-  roots.forEach((offset,index)=>{
-    const chordStart=start+index*step*4;
-    [0,4,7].forEach((interval,n)=>scheduleVoice(audio,midiFrequency(root-12+offset+interval),chordStart,step*3.6,n===0?"triangle":"sine",mode==="track"?.026:.018));
-    if (mode==="track"||phase===1||phase===6) scheduleKick(audio,chordStart);
-  });
-  return pattern.length*step+.55;
-}
-
-function toggleExample(mode, button) {
-  if (activePlayback && activePlayback.button===button) { stopPlayback(false); return; }
-  stopPlayback(false);
-  const day=selectedDay||currentDay();
-  const phase=lessons[day-1].phaseIndex;
-  activePlayback={button,mode};
-  button.textContent="Ⅱ";
-  button.setAttribute("aria-label","暂停播放");
-  if(mode==="hero") $("piano-roll").classList.add("is-playing");
-  if(mode==="track") $("waveform").classList.add("is-playing");
-  AudioEngine.playLesson(day,phase,{onEnd:()=>stopPlayback(true),onError:()=>{$("audio-status").textContent="播放失败：请检查标签页是否静音";stopPlayback(false)}});
-}
-
-function openLesson(day) {
-  selectedDay = day;
-  const savedStep=Math.max(0,Math.min(Number(lessonSteps[day])||0,4));
-  const isDone=day<=completedDays;
-  courseStep=isDone?0:day===currentDay()?savedStep:0;
-  taskChecks=isDone?[true,true,true]:day===currentDay()?[savedStep>=1,savedStep>=3,savedStep>=4]:[false,false,false];
-  lessonAudioPlayed=isDone||savedStep>=3;
-  const lesson = lessons[day-1];
-  const guide = lesson.guide;
-  $("modal-kicker").textContent = `DAY ${String(day).padStart(2,"0")} · ${phases[lesson.phaseIndex].title}`;
-  $("modal-title").textContent = lesson.title;
-  $("modal-intro").textContent = lesson.description;
-  $("modal-goal").textContent = guide.deliverable;
-  $("reader-summary").textContent = guide.summary;
-  $("reader-concepts").innerHTML = guide.concepts.map(item=>`<li>${item}</li>`).join("");
-  $("reader-example").textContent = guide.example;
-  $("reader-listen").textContent = guide.listen;
-  $("creation-prompt").textContent = guide.practice.join(" → ");
-  $("reader-deliverable").textContent = guide.deliverable;
-  $("previous-day").disabled = day===1;
-  $("next-day").disabled = day===100;
-  $("notice").hidden = true;
-  InteractiveCourse.prepare(day,lesson,isDone?4:savedStep,()=>{if(selectedDay===day)renderCourseStep()});
-  renderCourseStep();
-  $("lesson-modal").hidden = false;
+  if(inherited)setCheckState("neutral","已继承上一版工程","今天会在你之前的音乐上继续创作。右侧工具和达标规则已经切换为本课内容。")
+  $("lesson-modal").hidden=false;
   document.body.classList.add("modal-open");
   $("modal-close").focus();
 }
 
-function renderCourseStep() {
-  const labels=["学习","例子","听辨","实操","打卡"];
-  const isDone=selectedDay<=completedDays;
-  const savedStep=Math.max(0,Math.min(Number(lessonSteps[selectedDay])||0,4));
-  const maxUnlocked=isDone?4:Math.max(courseStep,savedStep);
-  $("course-progress").innerHTML=labels.map((label,index)=>`<button data-step="${index}" class="${index===courseStep?"active":""} ${isDone||index<maxUnlocked?"done":""}" ${index>maxUnlocked?"disabled":""}><i>${isDone||index<maxUnlocked?"✓":index+1}</i><span>${label}</span></button>`).join("");
-  document.querySelectorAll("[data-course-panel]").forEach(panel=>panel.hidden=Number(panel.dataset.coursePanel)!==courseStep);
-  document.querySelectorAll("[data-step]").forEach(button=>button.addEventListener("click",()=>{
-    if(Number(button.dataset.step)>maxUnlocked)return;
-    if(activePlayback?.mode==="lesson")stopPlayback(false);
-    courseStep=Number(button.dataset.step);
-    renderCourseStep();
-  }));
-  $("course-position").textContent=`${courseStep+1} / 5`;
-  $("course-previous").disabled=courseStep===0;
-  const nextLabels=["学完概念，继续 →","看懂例子，继续 →","完成听辨，继续 →","完成实操，去打卡 →",""];
-  $("course-next").textContent=nextLabels[courseStep];
-  $("course-next").hidden=courseStep===4;
-  $("course-next").classList.toggle("ready",isDone||InteractiveCourse.isComplete(selectedDay,courseStep));
-  renderTasks();
+function setCheckState(type,title,message){
+  const box=$("studio-check-result");
+  box.className=`check-result ${type==='neutral'?"":type}`;
+  box.innerHTML=`<strong>${title}</strong><span>${message}</span>`;
 }
 
-function advanceCourse() {
-  if(courseStep>=4)return;
-  if(selectedDay>completedDays&&!InteractiveCourse.isComplete(selectedDay,courseStep)){
-    InteractiveCourse.showRequired(selectedDay,courseStep);
-    return;
+function checkWork(){
+  const lesson=lessons[selectedDay-1];
+  const result=ComposerStudio.validate(lesson.target);
+  validated=result.ok;
+  $("save-and-checkin").disabled=!result.ok;
+  if(result.ok){
+    setCheckState("pass",`通过 · ${result.score} 分`,`${lesson.principle} 现在保存后，你的真实 WAV 会出现在主页作品区。`);
+  }else{
+    const detail=result.errors.slice(0,4).map((error,index)=>`${index+1}. ${error}`).join("<br>");
+    setCheckState("fail",`还差 ${result.errors.length} 项`,detail);
   }
-  if(selectedDay===currentDay()){
-    if(courseStep===0)taskChecks[0]=true;
-    if(courseStep===2)taskChecks[1]=true;
-    if(courseStep===3)taskChecks[2]=true;
+}
+
+async function saveAndCheckin(){
+  const lesson=lessons[selectedDay-1],result=ComposerStudio.validate(lesson.target);
+  if(!validated||!result.ok){validated=false;$("save-and-checkin").disabled=true;checkWork();return}
+  const button=$("save-and-checkin");
+  button.disabled=true;button.textContent="正在渲染 WAV…";
+  try{
+    const project=ComposerStudio.getState();
+    const wav=ComposerStudio.renderWav();
+    const now=Date.now();
+    const record={id:`day-${selectedDay}-${now}`,day:selectedDay,title:`Day ${String(selectedDay).padStart(2,"0")} · ${lesson.title}`,createdAt:now,wav,project};
+    await ProjectStore.save(record);
+    let checkedIn=false;
+    if(selectedDay===currentDay()&&selectedDay>completedDays){
+      const today=dateKey();
+      const previous=lastCheckin?new Date(`${lastCheckin}T00:00:00`):null;
+      const gap=previous?Math.round((new Date(`${today}T00:00:00`)-previous)/86400000):1;
+      streak=lastCheckin===today?streak:gap===1?streak+1:1;
+      lastCheckin=today;
+      completedDays=Math.min(100,completedDays+1);
+      selectedPhase=Math.floor(Math.min(completedDays,99)/10);
+      saveProgress();
+      checkedIn=true;
+    }
+    await loadSavedWorks(record.id);
+    renderDashboard();renderRoadmap();
+    setCheckState("pass",checkedIn?`Day ${selectedDay} 打卡成功 ✓`:"新版本已保存 ✓",`WAV 和工程已经写入主页“我的作品”。${checkedIn&&completedDays<100?`下一课是 Day ${completedDays+1}。`:"可以刷新页面验证播放。"}`);
+    button.textContent="已保存到主页 ✓";
+  }catch(error){
+    button.disabled=false;button.textContent="重试保存 WAV";
+    setCheckState("fail","保存失败",`浏览器没有写入作品：${error.message||"未知错误"}。请确认不是无痕模式并重试。`);
   }
-  if(activePlayback?.mode==="lesson")stopPlayback(false);
-  courseStep=Math.min(courseStep+1,4);
-  if(selectedDay===currentDay()){
-    lessonSteps[selectedDay]=Math.max(Number(lessonSteps[selectedDay])||0,courseStep);
-    saveState();
-  }
-  renderCourseStep();
-  $("modal-title").scrollIntoView({block:"start"});
 }
 
-function renderTasks() {
-  const lesson = lessons[selectedDay-1];
-  const guide = lesson.guide;
-  const taskData = [{tag:"学",time:"10 分钟",text:`读完「${lesson.title}」，能复述至少两个核心知识点`},{tag:"听",time:"8 分钟",text:guide.listen},{tag:"做",time:`${lesson.duration-18} 分钟`,text:guide.deliverable}];
-  $("daily-tasks").innerHTML = taskData.map((task,index)=>`<label class="${taskChecks[index]?"checked":""} locked"><input type="checkbox" ${taskChecks[index]?"checked":""} disabled><span>${task.tag}</span><div><strong>${task.text}</strong><small>${task.time}</small></div><i>${taskChecks[index]?"✓":""}</i></label>`).join("");
-  const button = $("complete-button");
-  const isDone=selectedDay<=completedDays;
-  button.disabled=isDone||(selectedDay===currentDay()&&!taskChecks.every(Boolean));
-  button.className="complete-button"+(isDone?" completed":selectedDay>currentDay()?" preview":"");
-  button.textContent=isDone?"这一天已完成 ✓":selectedDay>currentDay()?`这是预览 · 返回 Day ${currentDay()}`:"完成今天并打卡";
+function useHomeRecord(record){
+  if(!record)return;
+  const blob=record.wav instanceof Blob?record.wav:StudioAudio.render(record.project);
+  if(homeObjectUrl)URL.revokeObjectURL(homeObjectUrl);
+  homeObjectUrl=URL.createObjectURL(blob);
+  const audio=$("home-audio");
+  audio.src=homeObjectUrl;audio.load();
+  $("current-work").innerHTML=`<strong>${record.title}</strong><a href="${homeObjectUrl}" download="${record.title.replace(/[\\/:*?\"<>|]/g,"-")}.wav">下载 WAV</a>`;
+  document.querySelectorAll("[data-work-id]").forEach(button=>button.classList.toggle("active",button.dataset.workId===record.id));
 }
 
-function completeToday() {
-  if (selectedDay>currentDay()) { openLesson(currentDay()); return; }
-  if (selectedDay!==currentDay() || completedDays>=100) return;
-  if (!taskChecks.every(Boolean)) { $("notice").textContent="先完成上面的 3 个小任务，再打卡。慢一点也没关系。";$("notice").hidden=false;return; }
-  const today=localDate();
-  const previous=lastCheckin?new Date(`${lastCheckin}T00:00:00`):null;
-  const now=new Date(`${today}T00:00:00`);
-  const gap=previous?Math.round((now-previous)/86400000):1;
-  streak=lastCheckin===today?streak:gap===1?streak+1:1;
-  lessonSteps[selectedDay]=4;
-  completedDays=Math.min(completedDays+1,100);
-  lastCheckin=today;
-  saveState();
-  $("notice").textContent=completedDays===100?"毕业了！你的第一首完整作品已经走完 100 天。":`Day ${selectedDay} 打卡成功，下一站是 Day ${completedDays+1}。`;
-  $("notice").hidden=false;
-  renderDashboard();renderRoadmap();renderCourseStep();
+async function loadSavedWorks(preferredId){
+  savedRecords=(await ProjectStore.list()).filter(record=>record&&(record.wav instanceof Blob||record.project));
+  $("audio-status").textContent=savedRecords.length?`已保存 ${savedRecords.length} 个版本`:"还没有保存作品";
+  $("saved-works").innerHTML=savedRecords.slice(0,12).map(record=>`<button data-work-id="${record.id}" title="${record.title}">${record.title}</button>`).join("");
+  document.querySelectorAll("[data-work-id]").forEach(button=>button.addEventListener("click",()=>useHomeRecord(savedRecords.find(record=>record.id===button.dataset.workId))));
+  if(savedRecords.length)useHomeRecord(savedRecords.find(record=>record.id===preferredId)||savedRecords[0]);
 }
 
-function closeModal() { stopPlayback(false);$("lesson-modal").hidden=true;document.body.classList.remove("modal-open");$("start-today").focus(); }
+function closeModal(){ComposerStudio.stop();$("lesson-modal").hidden=true;document.body.classList.remove("modal-open")}
 
-$("waveform").innerHTML = Array.from({length:70},(_,i)=>`<i style="height:${18+((i*17)%58)}%"></i>`).join("")+"<b></b>";
-$("music-play").addEventListener("click",event=>toggleExample("hero",event.currentTarget));
-$("track-play").addEventListener("click",event=>toggleExample("track",event.currentTarget));
 $("start-today").addEventListener("click",()=>openLesson(currentDay()));
+$("console-enter").addEventListener("click",()=>openLesson(currentDay()));
 $("modal-close").addEventListener("click",closeModal);
 $("lesson-modal").addEventListener("click",event=>{if(event.target===$("lesson-modal"))closeModal()});
-$("complete-button").addEventListener("click",completeToday);
-$("course-next").addEventListener("click",advanceCourse);
-$("course-previous").addEventListener("click",()=>{if(courseStep>0){if(activePlayback?.mode==="lesson")stopPlayback(false);courseStep--;renderCourseStep()}});
 $("previous-day").addEventListener("click",()=>{if(selectedDay>1)openLesson(selectedDay-1)});
 $("next-day").addEventListener("click",()=>{if(selectedDay<100)openLesson(selectedDay+1)});
+$("check-work").addEventListener("click",checkWork);
+$("save-and-checkin").addEventListener("click",saveAndCheckin);
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("lesson-modal").hidden)closeModal()});
 
-renderDashboard();renderRoadmap();renderChordPads();
+renderDashboard();
+renderRoadmap();
+loadSavedWorks().catch(()=>{$("audio-status").textContent="作品存储暂不可用"});
