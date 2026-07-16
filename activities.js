@@ -59,7 +59,7 @@ const lessonActivities=[
   makeActivity(51,"synth","为主角、配角和背景各做一个音色。","音色选择应回答角色、频段和前后位置。",["保存三个音色快照","每个快照参数不同","逐个试听角色差异"],{snapshotsMin:3,minTweaks:4,minPlays:3}),
   makeActivity(52,"synth","不加效果地比较四种基础波形。","波形的谐波结构决定基础明暗与质感。",["试听 Sine、Triangle、Square、Saw","保持音高一致","完成四波形对比"],{wavesPlayed:["sine","triangle","square","sawtooth"]}),
   makeActivity(53,"synth","用 ADSR 做出 Pluck 与 Pad 两个预设。","包络决定声音随时间的形状。",["Pluck 使用短起音短尾音","Pad 使用长起音长尾音","保存两个快照"],{snapshotsMin:2,envelopeContrast:true,minPlays:2}),
-  makeActivity(54,"synth","用滤波器完成一次从暗到亮的扫频。","截止频率决定明暗，共振强调截止点。",["亮度先低后高","共振保持不过量","录入一次自动化"],{brightnessSweep:true,automationMin:1,minPlays:1}),
+  makeActivity(54,"synth","用滤波器完成一次从暗到亮的扫频。","截止频率决定明暗，共振强调截止点。",["把亮度调到 1–3 并记录暗点","把亮度调到 7–10 并记录亮点","播放自动化扫频"],{brightnessSweep:true,automationMin:2,minPlays:1}),
   makeActivity(55,"synth","让 LFO 分别调制音量和滤波。","LFO 用规律周期运动赋予持续音生命力。",["设置同步速率","试听音量调制","再试听滤波调制"],{lfoTargets:["volume","filter"],minCompares:1}),
   makeActivity(56,"synth","把一个短采样切成四片重新排列。","采样可通过切片、移调和反向变成新材料。",["建立四个切片","至少移动一个切片","使用一次反向或移调"],{slicesMin:4,sliceMovesMin:1,reverseOrPitch:true}),
   makeActivity(57,"synth","用三层互补音色构建一个复合声音。","分层要按频段、瞬态或宽度互补。",["加入 Sub、Body、Attack","逐层静音检查职责","保存三层预设"],{layers:["Sub","Body","Attack"],snapshotsMin:1,minPlays:1}),
